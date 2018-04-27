@@ -20,4 +20,5 @@ public class Utils {
     public static final String NAMESPACESOAP= "http://hr.aamanimyoffice.com/hr.asmx";
     public static  boolean iSInsert = true;
     public static PopupWindow mPOPUP_WINDOW;
+    public static final String ISINSERT="iSinsert";
 }

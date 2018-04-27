@@ -40,21 +40,33 @@ public class MainActivity extends AppCompatActivity{
     Context mContext;
     Toolbar mToolbar;
     RecyclerView mRecyclerView;
-
+    SecurePreference pref;
+    boolean Isinsert;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mRecyclerView = (RecyclerView)findViewById(R.id.recyclerview);
-        mToolbar = (Toolbar)findViewById(R.id.toolbar);
-
+        mContext = this;
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Log.e("Isinsert",String.valueOf(Isinsert));
+        mRecyclerViewAdapter = new RecyclerViewAdapter(articaleArrayList, mContext, new RecyclerviewClickListener() {
+            @Override
+            public void OnNewclick(int pos) {
+                Toast.makeText(getApplicationContext(), articaleArrayList.get(pos).getAuthor(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        mRecyclerView.setAdapter(mRecyclerViewAdapter);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        MakeApiCall(this);
         RecyclerView.LayoutManager manager = new LinearLayoutManager(getApplicationContext());
         mRecyclerView.setLayoutManager(manager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        if (pref.getPreferenceBoolean(Utils.ISINSERT,false,MainActivity.this)==false){
+            MakeApiCall(this);
+            Log.e("call","call");
+        }
     }
     public void MakeApiCall(final Context mContext){
         final ProgressDialog progress = new ProgressDialog(this);
@@ -79,13 +91,8 @@ public class MainActivity extends AppCompatActivity{
                         articale.setPublishedAt(j_obj.getString("publishedAt"));
                         articaleArrayList.add(articale);
                     }
-                     mRecyclerViewAdapter = new RecyclerViewAdapter(articaleArrayList, mContext, new RecyclerviewClickListener() {
-                         @Override
-                         public void OnNewclick(int pos) {
-                            Toast.makeText(getApplicationContext(),articaleArrayList.get(pos).getAuthor(),Toast.LENGTH_SHORT).show();
-                         }
-                     });
-                     mRecyclerView.setAdapter(mRecyclerViewAdapter);
+                        pref.setPreferenceBoolean(Utils.ISINSERT,true,MainActivity.this);
+                    mRecyclerViewAdapter.notifyDataSetChanged();
                     progress.dismiss();
                 } catch (JSONException e) {
                     e.printStackTrace();
